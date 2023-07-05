@@ -1,9 +1,9 @@
 const Song = require("../models/SongModel");
 
 const create = async (req, res) => {
-    const { titre, album, auteur, dateParution } = req.body;
+    const { titre, album, auteur, dateParution, genre } = req.body;
   try {
-    const song = await Song({ titre, album, auteur, dateParution });
+    const song = await Song({ titre, album, auteur, dateParution, genre });
     song.save().then((saveSong) => {
       res.status(201).json(saveSong);
     });
@@ -15,7 +15,7 @@ const create = async (req, res) => {
 }
 const update = async (req, res) => {
   const id = req.params.id;
-  const { titre, album, auteur, dateParution } = req.body;
+  const { titre, album, auteur, dateParution, genre } = req.body;
   try {
     const song = await Song.findOne({
       _id: id
@@ -28,6 +28,7 @@ const update = async (req, res) => {
       song.album = album;
       song.auteur = auteur;
       song.dateParution = dateParution;
+      song.genre = genre;
 
       song.save().then((saveSong) => {
         res.status(201).json(saveSong);
@@ -109,7 +110,7 @@ const updateCollaborateur = async (req, res) => {
         if (!song) {
           return res.status(404).json({ error: "Musique introuvable" });
         }
-        const collaborateur = libelle;
+        const collaborateur = { libelle };
         song.collaborateurs.find({_id: idCollaborateur}) = collaborateur;
         return song.save();
       })
@@ -140,5 +141,60 @@ const removeCollaborateur = async (req, res) => {
     res.status(500).json({ error: `Erreur lors de la suppression d'un collaborateur` });
   }
 }
+const updateGenre = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const genre = req.body;
+    await Song.findById(id)
+      .then((song) => {
+        if (!song) {
+          return res.status(404).json({ error: "Musique introuvable" });
+        }
+        song.genre = genre;
+        return song.save();
+      })
+      .then((updateSong) => {
+        res.json(updateSong);
+      });
+  } catch (error) {
+    res.status(500).json({ error: `Erreur lors de la modification du genre` });
+  }
+}
+const addOneVue = async (req, res) => {
+  try {
+    const id = req.params.id;
+    await Song.findById(id)
+      .then((song) => {
+        if (!song) {
+          return res.status(404).json({ error: "Musique introuvable" });
+        }
+        song.vuesCount++;
+        return song.save();
+      })
+      .then((updateSong) => res.json(updateSong));
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: `Erreur lors de l'ajout d'une vue à la musique` });
+  }
+}
+const addOneLike = async (req, res) => {
+  try {
+    const id = req.params.id;
+    await Song.findById(id)
+      .then((song) => {
+        if (!song) {
+          return res.status(404).json({ error: "Musique introuvable" });
+        }
+        song.likesCount++;
+        return song.save();
+      })
+      .then((updateSong) => res.json(updateSong));
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: `Erreur lors de l'ajout d'une vue à la musique` });
+  }
+}
 
-module.exports = { create, update, remove, show, showList, addCollaborateur, updateCollaborateur, removeCollaborateur };
+module.exports = { create, update, remove, show, showList, addCollaborateur, updateCollaborateur, removeCollaborateur, updateGenre, addOneVue, addOneLike };
