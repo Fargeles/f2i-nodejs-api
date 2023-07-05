@@ -110,7 +110,7 @@ const updateCollaborateur = async (req, res) => {
           return res.status(404).json({ error: "Musique introuvable" });
         }
         const collaborateur = libelle;
-        song.collaborateurs.findById(idCollaborateur) = collaborateur;
+        song.collaborateurs.find({_id: idCollaborateur}) = collaborateur;
         return song.save();
       })
       .then((updateSong) => {
@@ -120,5 +120,25 @@ const updateCollaborateur = async (req, res) => {
     res.status(500).json({ error: `Erreur lors de la modification d'un collaborateur` });
   }
 }
+const removeCollaborateur = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const idCollaborateur = req.params.idCollaborateur;
+    await Song.findById(id)
+      .then((song) => {
+        if (!song) {
+          return res.status(404).json({ error: "Musique introuvable" });
+        }
+        const index = song.collaborateurs.findIndex({_id: idCollaborateur});
+        song.collaborateurs.splice(index, 1);
+        return song.save();
+      })
+      .then((updateSong) => {
+        res.json(updateSong);
+      });
+  } catch (error) {
+    res.status(500).json({ error: `Erreur lors de la suppression d'un collaborateur` });
+  }
+}
 
-module.exports = { create, update, remove, show, showList, addCollaborateur, updateCollaborateur };
+module.exports = { create, update, remove, show, showList, addCollaborateur, updateCollaborateur, removeCollaborateur };

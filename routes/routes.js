@@ -5,7 +5,8 @@ const {
     show,
     showList,
     addCollaborateur,
-    updateCollaborateur
+    updateCollaborateur,
+    removeCollaborateur
 } = require("../controllers/SongController");
 const Song = require("../models/SongModel");
 
@@ -19,5 +20,6 @@ router.post('/:id/delete', remove)
 
 router.post('/:id/collaborateurs/add', addCollaborateur)
 router.put('/:id/collaborateurs/:idCollaborateur/update', updateCollaborateur)
+router.put('/:id/collaborateurs/:idCollaborateur/delete', removeCollaborateur)
 
 module.exports = router;
